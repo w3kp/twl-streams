@@ -24,7 +24,7 @@
     </div>
     <script>
       document.addEventListener("DOMContentLoaded", (event) => {
-        webSocket = new WebSocket("wss://twl-media-streams.onrender.com");
+        webSocket = new WebSocket("wss://" + window.location.hostname);
         const callList = document.getElementById("call-list");
 
         webSocket.onmessage = function (msg) {

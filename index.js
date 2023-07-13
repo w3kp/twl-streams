@@ -123,8 +123,8 @@ app.post("/", (req, res) => {
             <Parameter name="number" value="${req.body.From}"/>
             </Stream>
         </Start>
-        <Say>I will stream the next 60 seconds of audio through your websocket</Say>
-        <Pause length="60" />
+        <Say>I will stream the next 2 minutes of audio through your phone line</Say>
+        <Pause length="120" />
         </Response>
     `);
 })

@@ -39,7 +39,7 @@ app.post("/", (req, res) => {
             <Start>
                 <Stream url="wss://${req.headers.host}/" />
             </Start>
-            <Say>Hi Don Chicken! Welcome to Chat MSG!</Say>
+            <Say>Hi Don Chicken! Welcome to Chat MSG! Ipapapatwag ka sa Senado! Humanda ka!</Say>
             <Pause length="60" />
         </Response>
     `)

@@ -17,7 +17,7 @@ wss.on("connection", (ws) => {
                 console.log(`Starting media stream ${msg.streamSid}`);
                 break;
             case "media":
-                console.log(`Receiving audio...`);
+                // console.log(`Receiving audio...`);
                 break;
             case "connected":
                 console.log(`Call has ended.`);

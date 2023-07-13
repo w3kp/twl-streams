@@ -17,7 +17,7 @@ const transcriptionConfig = {
     config: {
         encoding: "MULAW",
         sampleRateHertz: 8000,
-        languageCode: "en-GB",
+        languageCode: "fil-PH",
     },
     interimResults: true, // If you want interim results, set this to true
 };

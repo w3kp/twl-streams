@@ -108,6 +108,7 @@ wss.on("connection", (ws) => {
     })
 });
 // <Stream url="wss://${req.headers.host}/" />
+{/* <Say>I will stream the next 2 minutes of audio through your phone line</Say> */}
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -123,7 +124,6 @@ app.post("/", (req, res) => {
             <Parameter name="number" value="${req.body.From}"/>
             </Stream>
         </Start>
-        <Say>I will stream the next 2 minutes of audio through your phone line</Say>
         <Pause length="120" />
         </Response>
     `);

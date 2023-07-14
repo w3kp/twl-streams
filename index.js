@@ -28,7 +28,7 @@ let chatBotId = '4PxC1IMVLj0dsU0fjO-N2';
 
 const sendMessagetoChatBase = (messageText, client, streamId, timeoutId) => {
     console.log('Sending Messages to Chatbot', {
-        messageText, client, streamId
+        messageText, streamId, timeoutId
     });
     // Ask answer to our chatbot
     const fetchAPI = async () =>  {

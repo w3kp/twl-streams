@@ -41,7 +41,6 @@ const sendMessagetoChatBase = (messageText, client, streamId) => {
                 authorization: `Bearer ${process.env.CHATBASE_AUTH_TOKEN}`
             }
         });
-        console.log(answers);
 
         let _answer = null;
 
@@ -89,13 +88,12 @@ wss.on("connection", (ws) => {
                             client.readyState === WebSocket.OPEN &&
                             client.subscribedStream === msg.streamSid
                         ) {
+                            sendMessagetoChatBase(_transcribeText, client, msg.streamSid);
                             client.send(JSON.stringify({
                                 stream: msg.streamSid,
                                 event: "interim-transcription",
                                 text: _transcribeText,
                             }));
-
-                            sendMessagetoChatBase(_transcribeText, client, msg.streamSid);
                         }
                     });
                 });

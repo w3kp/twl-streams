@@ -26,7 +26,7 @@ const transcriptionConfig = {
 let activeCalls = [];
 let chatBotId = '4PxC1IMVLj0dsU0fjO-N2';
 
-const sendMessagetoChatBase = (messageText, client, streamId) => {
+const sendMessagetoChatBase = (messageText, client, streamId, timeoutId) => {
     console.log('Sending Messages to Chatbot', {
         messageText, client, streamId
     });
@@ -53,6 +53,8 @@ const sendMessagetoChatBase = (messageText, client, streamId) => {
         } else {
             _answer = `I can't understand what you we're saying. Sorry`;
         }
+
+        clearTimeout(timeoutId);
 
         client.send(JSON.stringify({
             stream: streamId,
@@ -98,7 +100,7 @@ wss.on("connection", (ws) => {
                                 client.subscribedStream === msg.streamSid
                             ) {
                                 timeoutId = setTimeout(() => {
-                                    sendMessagetoChatBase(_transcribeText, client, msg.streamSid);
+                                    sendMessagetoChatBase(_transcribeText, client, msg.streamSid, timeoutId);
                                 }, 1000);
 
                                 client.send(JSON.stringify({

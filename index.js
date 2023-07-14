@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const axios = require("axios");
 const WebSocket = require("ws");
 const express = require("express");
 const app = express();
@@ -26,6 +27,9 @@ let activeCalls = [];
 let chatBotId = '4PxC1IMVLj0dsU0fjO-N2';
 
 const sendMessagetoChatBase = (messageText, client, streamId) => {
+    console.log('Sending Messages to Chatbot', {
+        messageText, client, streamId
+    });
     // Ask answer to our chatbot
     const fetchAPI = async () =>  {
         const answerResponse = await axios.post(`https://www.chatbase.co/api/v1/chat`, JSON.stringify({
@@ -89,6 +93,7 @@ wss.on("connection", (ws) => {
                             client.subscribedStream === msg.streamSid
                         ) {
                             sendMessagetoChatBase(_transcribeText, client, msg.streamSid);
+
                             client.send(JSON.stringify({
                                 stream: msg.streamSid,
                                 event: "interim-transcription",

@@ -38,6 +38,7 @@
             document.getElementById("transcription-text").innerHTML = data.text;
           }
           else if (data.event === "agent-response") {
+            console.log(data.event);
             document.getElementById("agent-response-text").innerHTML = data.text;
           }
           else if (data.event === "updateCalls") {

@@ -23,6 +23,44 @@ const transcriptionConfig = {
 };
 
 let activeCalls = [];
+let chatBotId = '4PxC1IMVLj0dsU0fjO-N2';
+
+const sendMessagetoChatBase = (messageText, client, streamId) => {
+    // Ask answer to our chatbot
+    const fetchAPI = async () =>  {
+        const answerResponse = await axios.post(`https://www.chatbase.co/api/v1/chat`, JSON.stringify({
+            messages: [{role: 'user', content: messageText}],
+            stream: false,
+            temperature: 0,
+            model: 'gpt-3.5-turbo',
+            chatbotId: chatBotId
+        }), {
+            headers: {
+                accept: 'application/json',
+                'content-type': 'application/json',
+                authorization: `Bearer ${process.env.CHATBASE_AUTH_TOKEN}`
+            }
+        });
+        console.log(answers);
+
+        let _answer = null;
+
+        if (answerResponse.data) {
+            _answer = answerResponse.data.text;
+        } else {
+            _answer = `I can't understand what you we're saying. Sorry`;
+        }
+
+        client.send(JSON.stringify({
+            stream: streamId,
+            event: "agent-response",
+            text: _answer,
+        }));
+
+        return answer;
+    }
+    fetchAPI();
+};
 
 wss.on("connection", (ws) => {
     console.log("New connection initiated!");
@@ -45,19 +83,20 @@ wss.on("connection", (ws) => {
                 .streamingRecognize(transcriptionConfig)
                 .on("error", console.error)
                 .on("data", (data) => {
+                    let _transcribeText = data.results[0].alternatives[0].transcript
                     wss.clients.forEach((client) => {
-                    if (
-                        client.readyState === WebSocket.OPEN &&
-                        client.subscribedStream === msg.streamSid
-                    ) {
-                        client.send(
-                        JSON.stringify({
-                            stream: msg.streamSid,
-                            event: "interim-transcription",
-                            text: data.results[0].alternatives[0].transcript,
-                        })
-                        );
-                    }
+                        if (
+                            client.readyState === WebSocket.OPEN &&
+                            client.subscribedStream === msg.streamSid
+                        ) {
+                            client.send(JSON.stringify({
+                                stream: msg.streamSid,
+                                event: "interim-transcription",
+                                text: _transcribeText,
+                            }));
+
+                            sendMessagetoChatBase(_transcribeText, client, msg.streamSid);
+                        }
                     });
                 });
 

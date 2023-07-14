@@ -21,6 +21,10 @@
         <h4>Transcription Text:</h4>
         <p id="transcription-text"></p>
       </div>
+      <div id="agent-response-container">
+        <h4>Agent Response:</h4>
+        <p id="agent-response-text"></p>
+      </div>
     </div>
     <script>
       document.addEventListener("DOMContentLoaded", (event) => {
@@ -29,11 +33,18 @@
 
         webSocket.onmessage = function (msg) {
           const data = JSON.parse(msg.data);
+
           if (data.event === "interim-transcription") {
             document.getElementById("transcription-text").innerHTML = data.text;
-          } else if (data.event === "updateCalls") {
+          }
+          else if (data.event === "agent-response") {
+            document.getElementById("agent-response-text").innerHTML = data.text;
+          }
+          else if (data.event === "updateCalls") {
             console.log(data.activeCalls);
+
             callList.innerHTML = "";
+
             data.activeCalls.forEach((call) => {
               const button = document.createElement("BUTTON");
               button.className = "open-call";

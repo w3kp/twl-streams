@@ -60,7 +60,7 @@ const sendMessagetoChatBase = (messageText, client, streamId) => {
             text: _answer,
         }));
 
-        return answer;
+        return _answer;
     }
     fetchAPI();
 };
@@ -69,39 +69,46 @@ wss.on("connection", (ws) => {
     console.log("New connection initiated!");
 
     let recognizeStream = null;
+    let timeoutId = null;
 
     ws.on("message", (message) => {
         const msg = JSON.parse(message);
+
         switch (msg.event) {
             case "connected":
                 console.log(`A new call has connected.`);
                 break;
             case "start":
                 console.log(`Starting media stream ${msg.streamSid}`);
-
                 ws.streamSid = msg.streamSid;
 
                 // Create Stream to the Google Speech to Text API
                 recognizeStream = speechClient
-                .streamingRecognize(transcriptionConfig)
-                .on("error", console.error)
-                .on("data", (data) => {
-                    let _transcribeText = data.results[0].alternatives[0].transcript
-                    wss.clients.forEach((client) => {
-                        if (
-                            client.readyState === WebSocket.OPEN &&
-                            client.subscribedStream === msg.streamSid
-                        ) {
-                            sendMessagetoChatBase(_transcribeText, client, msg.streamSid);
-
-                            client.send(JSON.stringify({
-                                stream: msg.streamSid,
-                                event: "interim-transcription",
-                                text: _transcribeText,
-                            }));
+                    .streamingRecognize(transcriptionConfig)
+                    .on("error", console.error)
+                    .on("data", (data) => {
+                        if (timeoutId !== null) {
+                            clearTimeout(timeoutId);
                         }
+
+                        let _transcribeText = data.results[0].alternatives[0].transcript
+                        wss.clients.forEach((client) => {
+                            if (
+                                client.readyState === WebSocket.OPEN &&
+                                client.subscribedStream === msg.streamSid
+                            ) {
+                                timeoutId = setTimeout(() => {
+                                    sendMessagetoChatBase(_transcribeText, client, msg.streamSid);
+                                }, 1000);
+
+                                client.send(JSON.stringify({
+                                    stream: msg.streamSid,
+                                    event: "interim-transcription",
+                                    text: _transcribeText,
+                                }));
+                            }
+                        });
                     });
-                });
 
                 activeCalls.push({
                     twilioStreamSid: msg.streamSid,
@@ -138,6 +145,10 @@ wss.on("connection", (ws) => {
                     })
                     );
                 });
+
+                if (timeoutId !== null) {
+                    clearTimeout(timeoutId);
+                }
                 recognizeStream.destroy();
                 break;
             case "subscribe":
@@ -158,15 +169,13 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, "/index.html")));
 
 app.post("/", (req, res) => {
     res.set("Content-Type", "text/xml");
-    console.log(req.body.From);
     res.send(`
         <Response>
         <Start>
             <Stream url="wss://${req.headers.host}/">
-            <Parameter name="number" value="${req.body.From}"/>
+                <Parameter name="number" value="${req.body.From}"/>
             </Stream>
         </Start>
-        <Say>Hi, I'm Maria, How can I help you?</Say>
         <Pause length="120" />
         </Response>
     `);

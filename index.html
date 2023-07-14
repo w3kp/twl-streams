@@ -36,6 +36,7 @@
 
           if (data.event === "interim-transcription") {
             document.getElementById("transcription-text").innerHTML = data.text;
+            document.getElementById("agent-response-text").innerHTML = "";
           }
           else if (data.event === "agent-response") {
             console.log(data.event);

@@ -39,8 +39,11 @@
             document.getElementById("transcription-text").innerHTML = data.text;
             document.getElementById("agent-response-text").innerHTML = "";
           }
+          else if (data.event === "agent-is-thinking") {
+            document.getElementById("agent-is-thinking").innerHTML = 'Agent is looking for a solution, please wait...';
+          }
           else if (data.event === "agent-response") {
-            console.log(data.event);
+            document.getElementById("agent-is-thinking").innerHTML = '';
             document.getElementById("agent-response-text").innerHTML = data.text;
           }
           else if (data.event === "updateCalls") {

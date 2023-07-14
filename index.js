@@ -106,6 +106,11 @@ wss.on("connection", (ws) => {
                                     event: "interim-transcription",
                                     text: _transcribeText,
                                 }));
+                                client.send(JSON.stringify({
+                                    stream: msg.streamSid,
+                                    event: "agent-is-thinking",
+                                    text: '',
+                                }));
                             }
                         });
                     });

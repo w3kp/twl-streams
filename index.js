@@ -161,6 +161,7 @@ app.post("/", (req, res) => {
             <Parameter name="number" value="${req.body.From}"/>
             </Stream>
         </Start>
+        <Say>Hi, I'm Maria, How can I help you?</Say>
         <Pause length="120" />
         </Response>
     `);

@@ -25,6 +25,9 @@
         <h4>Agent Response:</h4>
         <p id="agent-is-thinking"></p>
         <p id="agent-response-text"></p>
+        <br>
+        <br>
+        <audio id="player" controls></audio>
       </div>
     </div>
     <script>
@@ -47,21 +50,16 @@
             document.getElementById("agent-response-text").innerHTML = data.text;
           }
           else if (data.event === "voice-response") {
-            console.log('voice-response!!');
+            console.log('Voice Response!');
             if (data.error) {
               console.error(data.error);
             } else {
-              const audioData = atob(data.audio);
-              const audioBlob = new Blob([audioData], { type: 'audio/mpeg' });
-              const audioUrl = URL.createObjectURL(audioBlob);
-              const audio = new Audio(audioUrl);
-              audio.play();
-
-              // Update the status when the audio starts and ends
-              // statusElement.textContent = 'Speaking...';
-              // audio.onended = function() {
-              //   statusElement.textContent = 'Idle';
-              // };
+              console.log({ data });
+              const audio = new Blob([data.audio], { type: 'audio/mp3' });
+              const url = URL.createObjectURL(audio);
+              const audioElement = document.getElementById('player');
+              audioElement.src = url;
+              audioElement.play();
             }
           }
           else if (data.event === "updateCalls") {

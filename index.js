@@ -21,42 +21,25 @@ const ttsClient = new textToSpeech.TextToSpeechClient();
 const executeVoice = (message, client, streamId) => {
     
     let shortenedText = message.substring(0, 3000);
+
+    console.log({ shortenedText });
     
     const ttsRequest = {
         input: { text: shortenedText },
         voice: { languageCode: 'fil-PH', ssmlGender: 'NEUTRAL' },
-        audioConfig: { audioEncoding: 'LINEAR16' },
+        audioConfig: { audioEncoding: 'MP3' },
     };
 
     const fetchAPI = async () => {
         try {
             const [response] = await ttsClient.synthesizeSpeech(ttsRequest);
-            const audioBuffer = response.audioContent;
+            const audio = response.audioContent.toString('base64');
 
-            // Convert the audio data to MP3 and encode it as Base64
-            let audioBase64 = '';
-            ffmpeg()
-                .input(audioBuffer)
-                .inputFormat('wav')
-                .audioCodec('libmp3lame')
-                .toFormat('mp3')
-                .outputOptions('-f', 'base64')
-                .on('data', chunk => {
-                    audioBase64 += chunk.toString();
-                })
-                .on('end', () => {
-                    client.send(JSON.stringify({
-                        stream: streamId,
-                        event: "voice-response",
-                        audio: audioBase64,
-                        length: audioBase64.length
-                    }));
-                })
-                .on('error', error => {
-                    console.error('Failed to convert audio to MP3:', error);
-                    client.send(JSON.stringify({ stream: streamId, event: "voice-response", error: 'Failed to convert audio to MP3' }));
-                })
-                .run();
+            client.send(JSON.stringify({
+                stream: streamId,
+                event: "voice-response",
+                audio,
+            }));
             
         } catch (error) {
             console.error('Failed to synthesize speech:', error);

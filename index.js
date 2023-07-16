@@ -96,7 +96,7 @@ const sendMessagetoChatBase = (messageText, client, streamId, timeoutId) => {
             text: _answer,
         }));
 
-        executeVoice('Ako ay isang AI assistant, laging handang mag-help sa inyo! Goodbye!', client, streamId);
+        executeVoice(_answer, client, streamId);
 
         return _answer;
     }

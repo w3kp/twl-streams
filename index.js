@@ -13,6 +13,37 @@ const bodyParser = require("body-parser");
 const speech = require("@google-cloud/speech");
 const speechClient = new speech.SpeechClient();
 
+//Include Google Text to Speech
+const textToSpeech = require('@google-cloud/text-to-speech');
+
+const executeVoice = (message, client, streamId) => {
+    
+    let shortenedText = message.substring(0, 3000);
+    
+    const ttsRequest = {
+        input: { text: shortenedText },
+        voice: { languageCode: 'fil-PH', ssmlGender: 'NEUTRAL' },
+        audioConfig: { audioEncoding: 'OGG_OPUS' },
+    };
+
+    const fetchAPI = async () => {
+        try {
+            const [response] = await textToSpeech.synthesizeSpeech(ttsRequest);
+            // ws.send(response.audioContent);
+            client.send(JSON.stringify({
+                stream: streamId,
+                event: "voice-response",
+                audio: response.audioContent,
+            }));
+        } catch (error) {
+            console.error('Failed to synthesize speech:', error);
+            ws.send(JSON.stringify({ error: 'Failed to synthesize speech' }));
+        }
+    }
+
+    fetchAPI();
+};
+
 //Configure Transcription Request
 const transcriptionConfig = {
     config: {
@@ -62,10 +93,13 @@ const sendMessagetoChatBase = (messageText, client, streamId, timeoutId) => {
             text: _answer,
         }));
 
+        executeVoice('Ako ay isang AI assistant, laging handang mag-help sa inyo! Goodbye!', client, streamId);
+
         return _answer;
     }
     fetchAPI();
 };
+
 
 wss.on("connection", (ws) => {
     console.log("New connection initiated!");

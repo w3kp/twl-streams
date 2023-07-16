@@ -46,6 +46,13 @@
             document.getElementById("agent-is-thinking").innerHTML = '';
             document.getElementById("agent-response-text").innerHTML = data.text;
           }
+          else if (data.event === "voice-response") {
+            console.log('voice-response!!');
+            const audioBlob = new Blob([data.audio], { type: 'audio/ogg' });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+          }
           else if (data.event === "updateCalls") {
             console.log(data.activeCalls);
 

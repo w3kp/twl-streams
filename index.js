@@ -33,6 +33,8 @@ const executeVoice = (message, client, streamId) => {
     const fetchAPI = async () => {
         try {
             const [response] = await ttsClient.synthesizeSpeech(ttsRequest);
+            console.log(response.audioContent);
+            console.log(response.audioContent.toString('base64'));
             const audio = response.audioContent.toString('base64');
 
             client.send(JSON.stringify({

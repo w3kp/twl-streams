@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const axios = require("axios");
+const ffmpeg = require("fluent-ffmpeg");
 const WebSocket = require("ws");
 const express = require("express");
 const app = express();
@@ -24,21 +25,42 @@ const executeVoice = (message, client, streamId) => {
     const ttsRequest = {
         input: { text: shortenedText },
         voice: { languageCode: 'fil-PH', ssmlGender: 'NEUTRAL' },
-        audioConfig: { audioEncoding: 'OGG_OPUS' },
+        audioConfig: { audioEncoding: 'LINEAR16' },
     };
 
     const fetchAPI = async () => {
         try {
             const [response] = await ttsClient.synthesizeSpeech(ttsRequest);
-            // ws.send(response.audioContent);
-            client.send(JSON.stringify({
-                stream: streamId,
-                event: "voice-response",
-                audio: response.audioContent,
-            }));
+            const audioBuffer = response.audioContent;
+
+            // Convert the audio data to MP3 and encode it as Base64
+            let audioBase64 = '';
+            ffmpeg()
+                .input(audioBuffer)
+                .inputFormat('wav')
+                .audioCodec('libmp3lame')
+                .toFormat('mp3')
+                .outputOptions('-f', 'base64')
+                .on('data', chunk => {
+                    audioBase64 += chunk.toString();
+                })
+                .on('end', () => {
+                    client.send(JSON.stringify({
+                        stream: streamId,
+                        event: "voice-response",
+                        audio: audioBase64,
+                        length: audioBase64.length
+                    }));
+                })
+                .on('error', error => {
+                    console.error('Failed to convert audio to MP3:', error);
+                    client.send(JSON.stringify({ stream: streamId, event: "voice-response", error: 'Failed to convert audio to MP3' }));
+                })
+                .run();
+            
         } catch (error) {
             console.error('Failed to synthesize speech:', error);
-            ws.send(JSON.stringify({ error: 'Failed to synthesize speech' }));
+            client.send(JSON.stringify({ stream: streamId, event: "voice-response", error: 'Failed to synthesize speech' }));
         }
     }
 

@@ -48,11 +48,21 @@
           }
           else if (data.event === "voice-response") {
             console.log('voice-response!!');
-            const audioBlob = new Blob([data.audio], { type: 'audio/ogg' });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            console.log(audioUrl);
-            const audio = new Audio(audioUrl);
-            audio.play();
+            if (data.error) {
+              console.error(data.error);
+            } else {
+              const audioData = atob(data.audio);
+              const audioBlob = new Blob([audioData], { type: 'audio/mpeg' });
+              const audioUrl = URL.createObjectURL(audioBlob);
+              const audio = new Audio(audioUrl);
+              audio.play();
+
+              // Update the status when the audio starts and ends
+              // statusElement.textContent = 'Speaking...';
+              // audio.onended = function() {
+              //   statusElement.textContent = 'Idle';
+              // };
+            }
           }
           else if (data.event === "updateCalls") {
             console.log(data.activeCalls);

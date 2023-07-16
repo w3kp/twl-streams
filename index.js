@@ -15,6 +15,7 @@ const speechClient = new speech.SpeechClient();
 
 //Include Google Text to Speech
 const textToSpeech = require('@google-cloud/text-to-speech');
+const ttsClient = new textToSpeech.TextToSpeechClient();
 
 const executeVoice = (message, client, streamId) => {
     
@@ -28,7 +29,7 @@ const executeVoice = (message, client, streamId) => {
 
     const fetchAPI = async () => {
         try {
-            const [response] = await textToSpeech.synthesizeSpeech(ttsRequest);
+            const [response] = await ttsClient.synthesizeSpeech(ttsRequest);
             // ws.send(response.audioContent);
             client.send(JSON.stringify({
                 stream: streamId,
@@ -58,9 +59,6 @@ let activeCalls = [];
 let chatBotId = '4PxC1IMVLj0dsU0fjO-N2';
 
 const sendMessagetoChatBase = (messageText, client, streamId, timeoutId) => {
-    console.log('Sending Messages to Chatbot', {
-        messageText, streamId, timeoutId
-    });
     // Ask answer to our chatbot
     const fetchAPI = async () =>  {
         const answerResponse = await axios.post(`https://www.chatbase.co/api/v1/chat`, JSON.stringify({

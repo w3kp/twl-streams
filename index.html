@@ -50,6 +50,7 @@
             console.log('voice-response!!');
             const audioBlob = new Blob([data.audio], { type: 'audio/ogg' });
             const audioUrl = URL.createObjectURL(audioBlob);
+            console.log(audioUrl);
             const audio = new Audio(audioUrl);
             audio.play();
           }

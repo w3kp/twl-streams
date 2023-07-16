@@ -55,11 +55,18 @@
               console.error(data.error);
             } else {
               console.log({ data });
-              const audio = new Blob([data.audio], { type: 'audio/mp3' });
-              const url = URL.createObjectURL(audio);
-              console.log(url);
-              const audioElement = document.getElementById('player');
-              audioElement.src = url;
+              // const audio = new Blob([data.audio], { type: 'audio/mp3' });
+              // const url = URL.createObjectURL(audio);
+              // console.log(url);
+              // const audioElement = document.getElementById('player');
+              // audioElement.src = url;
+              // audioElement.play();
+
+              const audioBlob = new Blob([Uint8Array.from(atob(data.audio), c => c.charCodeAt(0))], { type: 'audio/mp3' });
+              const audioUrl = URL.createObjectURL(audioBlob);
+              console.log(audioUrl);
+              const audioElement = document.querySelector('audio');
+              audioElement.src = audioUrl;
               audioElement.play();
             }
           }

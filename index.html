@@ -57,6 +57,7 @@
               console.log({ data });
               const audio = new Blob([data.audio], { type: 'audio/mp3' });
               const url = URL.createObjectURL(audio);
+              console.log(url);
               const audioElement = document.getElementById('player');
               audioElement.src = url;
               audioElement.play();
